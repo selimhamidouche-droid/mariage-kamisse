@@ -64,7 +64,7 @@
       justify-content: center;
       /* Même fond bleu nuit raccord avec le body */
       background: radial-gradient(ellipse at 50% 32%, #1B2436 0%, #0D131F 48%, #05070C 100%),
-                  url('assets/berber_pattern_bg.jpeg') center/cover;
+                  url('assets/berber_pattern_bg.optimized.jpg') center/cover;
       background-blend-mode: overlay;
     }
 
@@ -1198,8 +1198,8 @@
     <!-- Vidéo officielle -->
     <button id="video-play" class="btn-pill video-play" hidden type="button">Lire le film</button>
     <p id="video-status" class="video-status" role="status"></p>
-    <video id="main-video" playsinline preload="auto">
-      <source src="Marriage_kamisse_202609060644.mp4" type="video/mp4">
+    <video id="main-video" muted playsinline preload="auto" poster="assets/video_poster.png">
+      <source src="Marriage_kamisse_202609060644.mp4?v=4" type="video/mp4">
     </video>
 
     <!-- Barre de progression dorée -->
@@ -1227,9 +1227,14 @@
     </div>
   </div>
 
-  <!-- Signature 3D persistante : création numérique de Sélim -->
-  <div class="signature-badge" role="img" aria-label="Sélim Agency">
-    <span class="signature-badge__label">Sélim Agency</span>
+  <!-- Signature visuelle persistante : logo Maison Selim détouré -->
+  <div class="signature-badge" role="img" aria-label="Maison Selim">
+    <img
+      class="signature-badge__image"
+      src="assets/maison-selim-mark-fallback.png"
+      alt=""
+      decoding="async"
+    >
   </div>
 
 </div> <!-- /app -->
@@ -1359,8 +1364,11 @@
   replayVideo.addEventListener('click', () => {
     finalInvitation.classList.remove('active');
     finalInvitation.setAttribute('aria-hidden', 'true');
-    mainVideo.currentTime = 0;
-    mainVideo.play().catch(() => {});
+    const replay = window.invitationVideoPlayback?.play({ reset: true, preferSound: !mainVideo.muted });
+    if (!replay) {
+      mainVideo.currentTime = 0;
+      mainVideo.play().catch(() => {});
+    }
   });
 
   returnEnvelope.addEventListener('click', () => {
@@ -1384,7 +1392,42 @@
   }
 </script>
 
-<script type="module" src="assets/experience.js?v=2"></script>
+<!-- Garde vidéo : initialisation déclarative avant le chargement du moteur 3D. -->
+<script src="assets/video-recovery.js?v=1"></script>
+
+<!-- Moteur 3D : chargement après le premier rendu pour garder l'écran d'accueil rapide. -->
+<script type="module">
+  const envelopeButton = document.getElementById('open-envelope');
+  let experienceModule;
+  let handingOff = false;
+
+  const loadExperience = () => {
+    experienceModule ??= import('./assets/experience.js?v=4');
+    return experienceModule;
+  };
+
+  // Si l'invité touche l'enveloppe avant la fin du chargement, on rejoue son clic
+  // juste après l'initialisation du moteur 3D.
+  envelopeButton?.addEventListener('click', async (event) => {
+    if (handingOff) return;
+    event.stopImmediatePropagation();
+    try {
+      await loadExperience();
+      window.installInvitationVideoRecovery?.();
+      handingOff = true;
+      envelopeButton.click();
+    } catch (error) {
+      console.warn('Le moteur 3D n’a pas pu être chargé.', error);
+    }
+  });
+
+  const startExperience = () => { void loadExperience(); };
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(startExperience, { timeout: 1500 });
+  } else {
+    window.setTimeout(startExperience, 800);
+  }
+</script>
 
 <!-- Vercel Web Analytics -->
 <script>
@@ -1395,7 +1438,13 @@
 <script defer src="/_vercel/insights/script.js"></script>
 
 <!-- Vercel Speed Insights -->
-<script type="module" src="assets/speed-insights.js?v=1"></script>
+<script>
+  window.si = window.si || function () {
+    (window.siq = window.siq || []).push(arguments);
+  };
+</script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
 
 </body>
 </html>
+
