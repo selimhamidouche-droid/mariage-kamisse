@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Une enveloppe scellée vous attend. Touchez le sceau pour découvrir le message qui vous est destiné.">
+  <title>Un Message Personnel Vous Est Destiné ✉️</title>
+  
+  <!-- Polices Google Fonts de Haute Joaillerie & Papeterie Royale -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,600&family=Italiana&family=Jost:wght@300;400;500;600&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ══════════════════════════════════════════════
+       VARIABLES & CHARTE HAUTE COUTURE
+    ══════════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --gold-light:     #FBF2D5;
+      --gold-primary:   #D4AF37;
+      --gold-dark:      #917122;
+      --gold-gradient:  linear-gradient(135deg, #FCF5DC 0%, #E7CC88 28%, #BF9632 52%, #F6E2AA 78%, #9E7920 100%);
+      --gold-foil:      linear-gradient(120deg, #D4AF37 0%, #FFF2CC 25%, #E5C368 50%, #9E7920 80%, #F5DE9C 100%);
+      --bg-dark:        #06080E;
+      --bg-card:        #FAF6EE;
+      --text-dark:      #20150A;
+      --text-muted:     #685744;
+      --font-serif:     'Cormorant Garamond', Georgia, serif;
+      --font-luxury:    'Italiana', 'Cinzel', serif;
+      --font-script:    'Pinyon Script', cursive;
+      --font-sans:      'Jost', sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      font-family: var(--font-sans);
+      color: #FFFFFF;
+      touch-action: manipulation;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* ══════════════════════════════════════════════
+       APP CONTAINER — plein écran, composants centrés
+    ══════════════════════════════════════════════ */
+    .app {
+      position: relative;
+      /* Plein écran sans limite de largeur visible */
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      /* Même fond bleu nuit raccord avec le body */
+      background: radial-gradient(ellipse at 50% 32%, #1B2436 0%, #0D131F 48%, #05070C 100%),
+                  url('assets/berber_pattern_bg.jpeg') center/cover;
+      background-blend-mode: overlay;
+    }
+
+    /* Poussière d'or flottante subtile */
+    #gold-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ══════════════════════════════════════════════
+       ÉTAPE 2 : LE FILM DU MARIAGE (PLEIN ÉCRAN)
+    ══════════════════════════════════════════════ */
+    .video-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    .video-stage.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #main-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Commandes vidéo raffinées et discrètes */
+    .video-controls {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.25rem;
+      right: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 30;
+      pointer-events: auto;
+    }
+
+    .btn-pill {
+      background: rgba(6, 8, 14, 0.76);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 30px;
+      padding: 0.5rem 0.95rem;
+      color: #FFF;
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    }
+
+    .btn-pill:hover {
+      background: rgba(212, 175, 55, 0.25);
+      border-color: var(--gold-primary);
+      transform: translateY(-1px);
+    }
+
+    .icon-svg {
+      display: inline-block;
+      vertical-align: middle;
+      fill: currentColor;
+    }
+
+    .video-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      z-index: 30;
+    }
+
+    .video-progress__bar {
+      height: 100%;
+      width: 0%;
+      background: var(--gold-gradient);
+      transition: width 0.1s linear;
+    }
+
+    /* ══════════════════════════════════════════════
+       ÉTAPE 3 : LA VRAIE INVITATION
+    ══════════════════════════════════════════════ */
+    .final-invitation {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: #090806;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.02);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .final-invitation::before {
+      content: "";
+      position: absolute;
+      inset: -24px;
+      z-index: 0;
+      background: url('assets/invitation-finale.jpeg') center / cover no-repeat;
+      filter: blur(24px) brightness(0.62) saturate(0.82);
+      transform: scale(1.08);
+      opacity: 0.92;
+    }
+
+    .final-invitation::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(180deg, rgba(4, 5, 8, 0.2), rgba(4, 5, 8, 0.48));
+      pointer-events: none;
+    }
+
+    .final-invitation.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    .final-invitation__image {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 42px rgba(0, 0, 0, 0.65));
+    }
+
+    .final-invitation__actions {
+      position: absolute;
+      z-index: 2;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .final-invitation__replay,
+    .final-invitation__return {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        linear-gradient(110deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.08) 42%, rgba(196, 221, 255, 0.16)),
+        rgba(20, 24, 32, 0.36);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 30px;
+      padding: 0.55rem 0.9rem;
+      color: #fff;
+      font: 500 0.7rem var(--font-sans);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.52),
+        inset 0 -8px 18px rgba(78, 112, 150, 0.14),
+        0 10px 28px rgba(0, 0, 0, 0.35);
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .final-invitation__replay::before,
+    .final-invitation__return::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      z-index: -1;
+      border-radius: inherit;
+      background:
+        linear-gradient(112deg, rgba(255, 255, 255, 0.34), transparent 27%, transparent 62%, rgba(196, 221, 255, 0.16)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.02));
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .final-invitation__replay:hover,
+    .final-invitation__return:hover {
+      border-color: rgba(255, 255, 255, 0.82);
+      background: rgba(96, 125, 160, 0.3);
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.7),
+        0 14px 34px rgba(0, 0, 0, 0.45),
+        0 0 22px rgba(180, 215, 255, 0.16);
+    }
+
+    @media (max-width: 520px) {
+      .final-invitation__actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+      }
+
+      .final-invitation__replay,
+      .final-invitation__return {
+        width: 100%;
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       ÉTAPE 3 : LA CARTE D'INVITATION HAUTE PAPETERIE
+    ══════════════════════════════════════════════ */
+    .card-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(0.9rem, 2.5vw, 1.4rem);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(28px) scale(0.96);
+      transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .card-stage.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Feuillet d'artisan imprimeur Glassmorphism */
+    .card-sheet {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      max-height: 94vh;
+      background: linear-gradient(160deg, rgba(255, 253, 248, 0.88) 0%, rgba(246, 239, 224, 0.85) 100%), 
+                  url('assets/paper_texture.jpg') center/cover;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 20px;
+      padding: clamp(1.6rem, 3.8vh, 2.2rem) clamp(1.2rem, 3vw, 1.6rem) clamp(1.4rem, 3vh, 1.8rem);
+      box-shadow: 
+        0 35px 90px rgba(0, 0, 0, 0.85),
+        0 0 0 1px rgba(212, 175, 55, 0.45),
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      text-align: center;
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    /* Double filet doré intérieur d'époque */
+    .card-sheet::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(194, 155, 56, 0.45);
+      border-radius: 14px;
+      pointer-events: none;
+    }
+
+    .card-sheet::after {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border: 1px dashed rgba(194, 155, 56, 0.22);
+      border-radius: 10px;
+      pointer-events: none;
+    }
+
+    .card-content-wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+    }
+
+    /* Sceau de cire officiel miniature sur le carton */
+    .card__seal-emblem {
+      margin: 0 auto 0.35rem;
+      width: clamp(42px, 8vw, 48px);
+      height: clamp(42px, 8vw, 48px);
+      filter: drop-shadow(0 3px 8px rgba(100, 20, 20, 0.4));
+    }
+
+    .card__seal-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .card__bismillah {
+      font-family: 'Amiri', serif;
+      font-size: clamp(1.05rem, 2.8vw, 1.25rem);
+      color: var(--gold-dark);
+      margin-bottom: 0.25rem;
+      opacity: 0.92;
+    }
+
+    .card__subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.32em;
+      color: var(--gold-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .card__families {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(0.92rem, 2.4vw, 1.02rem);
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .card__names {
+      font-family: 'Italiana', 'Playfair Display', serif;
+      margin: 0.15rem 0;
+      line-height: 1.15;
+    }
+
+    .card__name {
+      display: inline-block;
+      font-size: clamp(2.1rem, 5.5vw, 2.6rem);
+      color: #1F150B;
+      letter-spacing: 0.02em;
+    }
+
+    .card__ampersand {
+      display: inline-block;
+      font-family: var(--font-script);
+      font-size: clamp(1.8rem, 4.5vw, 2.2rem);
+      color: var(--gold-primary);
+      margin: 0 0.25rem;
+      vertical-align: middle;
+    }
+
+    .card__text {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(0.95rem, 2.5vw, 1.08rem);
+      line-height: 1.48;
+      color: var(--text-muted);
+      margin: 0.5rem 0;
+    }
+
+    /* Séparateur ornemental doré */
+    .card__filigree-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 0.5rem auto;
+      max-width: 220px;
+    }
+
+    .filigree-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(194, 155, 56, 0.45), transparent);
+    }
+
+    .filigree-symbol {
+      color: var(--gold-primary);
+      font-size: 0.65rem;
+    }
+
+    /* Plaque de texte d'annonce Glassmorphism */
+    .card__announcement-glass {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-radius: 16px;
+      padding: clamp(0.75rem, 2vh, 1.05rem) clamp(0.8rem, 2.5vw, 1.25rem);
+      margin: 0.35rem 0;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.7);
+    }
+
+    /* Bloc Détails de Célébration Glassmorphism */
+    .card__details {
+      background: rgba(255, 255, 255, 0.48);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 16px;
+      padding: clamp(0.75rem, 2vh, 1rem) 1rem;
+      margin: 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.75);
+    }
+
+    .card__detail-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+    }
+
+    .card__detail-heading {
+      font-family: 'Cinzel', serif;
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--gold-dark);
+    }
+
+    .card__date {
+      font-family: 'Italiana', 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 3.2vw, 1.35rem);
+      font-weight: 600;
+      color: #1F150B;
+      letter-spacing: 0.04em;
+    }
+
+    .card__venue {
+      font-family: var(--font-serif);
+      font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+      font-weight: 500;
+      color: #382B1B;
+    }
+
+    .card__venue-link-wrap {
+      margin-top: 0.2rem;
+    }
+
+    .card__map-link {
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--gold-dark);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(255, 255, 255, 0.52);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-radius: 20px;
+      padding: 0.28rem 0.85rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: all 0.2s;
+    }
+
+    .card__map-link:hover {
+      color: #1A1108;
+      background: rgba(212, 175, 55, 0.18);
+      border-color: var(--gold-primary);
+      transform: translateY(-1px);
+    }
+
+    /* Actions Carte d'Invitation */
+    .card__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-rsvp {
+      background: var(--gold-gradient);
+      border: none;
+      border-radius: 35px;
+      padding: clamp(0.85rem, 2.2vh, 0.95rem) 1.4rem;
+      color: #1A1108;
+      font-family: 'Cinzel', var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-rsvp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(212, 175, 55, 0.55);
+    }
+
+    .btn-rsvp-gem {
+      font-size: 0.75rem;
+      color: #8C6D1F;
+    }
+
+    .btn-replay {
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 30px;
+      padding: 0.55rem 1.1rem;
+      color: var(--text-dark);
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+      transition: all 0.2s;
+    }
+
+    .btn-replay:hover {
+      border-color: var(--gold-primary);
+      color: #1A1108;
+      background: rgba(212, 175, 55, 0.18);
+      transform: translateY(-1px);
+    }
+
+    /* ══════════════════════════════════════════════
+       MODALE RSVP : ÉCRIN DE RÉPONSE NOBLE GLASSMORPHISM
+    ══════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(4, 6, 12, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.38s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-sheet {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      max-height: 88vh;
+      overflow-y: auto;
+      margin: 0 auto;
+      background: linear-gradient(180deg, rgba(16, 23, 38, 0.88) 0%, rgba(8, 12, 20, 0.94) 100%);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      border-top: 1px solid rgba(212, 175, 55, 0.55);
+      border-left: 1px solid rgba(212, 175, 55, 0.22);
+      border-right: 1px solid rgba(212, 175, 55, 0.22);
+      padding: 1.6rem 1.4rem 2.4rem;
+      box-shadow: 
+        0 -25px 70px rgba(0, 0, 0, 0.95),
+        inset 0 1px 1px rgba(255, 255, 255, 0.18);
+      transform: translateY(100%);
+      transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+    }
+
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal__drag {
+      width: 42px;
+      height: 4px;
+      background: rgba(212, 175, 55, 0.38);
+      border-radius: 2px;
+      margin: 0 auto 1.2rem;
+    }
+
+    .btn-close-modal {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-close-modal:hover {
+      background: rgba(212, 175, 55, 0.25);
+      color: var(--gold-light);
+      border-color: var(--gold-primary);
+      transform: scale(1.05);
+    }
+
+    /* Stepper indicateur noble Glassmorphism */
+    .rsvp-stepper-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1.3rem;
+    }
+
+    .stepper-pill {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.38rem 0.85rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: rgba(255, 255, 255, 0.48);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+    }
+
+    .stepper-pill.active {
+      background: rgba(212, 175, 55, 0.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: var(--gold-light);
+      border-color: rgba(212, 175, 55, 0.55);
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .stepper-pill.completed {
+      background: rgba(212, 175, 55, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--gold-primary);
+      border-color: rgba(212, 175, 55, 0.35);
+    }
+
+    .modal__header-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 16px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .modal__title {
+      font-family: 'Italiana', 'Playfair Display', serif;
+      font-size: 1.55rem;
+      color: var(--gold-light);
+      text-align: center;
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.02em;
+    }
+
+    .modal__subtitle {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.92rem;
+      color: rgba(255, 255, 255, 0.72);
+      text-align: center;
+    }
+
+    /* Steps */
+    .rsvp-step {
+      display: none;
+      animation: fadeInStep 0.32s ease forwards;
+    }
+
+    .rsvp-step.active {
+      display: block;
+    }
+
+    @keyframes fadeInStep {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cartes de Présence Artistiques Glassmorphism */
+    .presence-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-bottom: 1.3rem;
+    }
+
+    .presence-card {
+      position: relative;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 16px;
+      padding: 1.15rem 0.85rem;
+      text-align: center;
+      transition: all 0.28s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .presence-card:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(212, 175, 55, 0.45);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 15px rgba(212, 175, 55, 0.15);
+    }
+
+    .presence-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .presence-card .presence-icon {
+      font-size: 1.4rem;
+      color: var(--gold-primary);
+      filter: drop-shadow(0 2px 6px rgba(212,175,55,0.4));
+    }
+
+    .presence-card .presence-text {
+      font-family: var(--font-serif);
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.88);
+      line-height: 1.3;
+    }
+
+    .presence-card.selected {
+      background: rgba(212, 175, 55, 0.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-color: var(--gold-primary);
+      box-shadow: 
+        0 8px 28px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(212, 175, 55, 0.28),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .presence-card.selected .presence-text {
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+
+    /* Champs de formulaire nobles Glassmorphism */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .form-label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--gold-light);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      color: #FFF;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    }
+
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: rgba(255, 255, 255, 0.36);
+      font-size: 0.82rem;
+      font-style: italic;
+    }
+
+    .form-select option {
+      background: #0E1422;
+      color: #FFF;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--gold-primary);
+      background: rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.28), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-textarea {
+      resize: none;
+      height: 80px;
+    }
+
+    /* Actions du Stepper */
+    .step-actions {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.25rem;
+    }
+
+    .btn-step-prev {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 50px;
+      padding: 0.85rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn-step-prev:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(212, 175, 55, 0.35);
+      color: #FFF;
+      transform: translateY(-1px);
+    }
+
+    .btn-step-next, .form-submit {
+      flex: 2;
+      background: var(--gold-gradient);
+      border: none;
+      border-radius: 50px;
+      padding: 0.9rem;
+      color: #1A1108;
+      font-family: 'Cinzel', var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      transition: all 0.25s ease;
+    }
+
+    .btn-step-next:hover, .form-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(212, 175, 55, 0.5);
+    }
+
+    .btn-arrow {
+      font-size: 0.75rem;
+      color: #8C6D1F;
+    }
+
+    /* Écran de Remerciement Prestige Glassmorphism */
+    .rsvp-success-screen {
+      text-align: center;
+      padding: 1.5rem 0.5rem 0.5rem;
+      animation: fadeInStep 0.4s ease forwards;
+    }
+
+    .success-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.35));
+    }
+
+    .success-seal-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .success-title {
+      font-family: 'Italiana', 'Playfair Display', serif;
+      font-size: 1.7rem;
+      color: var(--gold-light);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    .success-desc {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 1.4rem;
+    }
+
+    .success-recap {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.4rem;
+      text-align: left;
+      font-size: 0.84rem;
+      color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .success-recap-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .success-recap-item:last-child {
+      border-bottom: none;
+    }
+
+    .success-recap-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .success-recap-value {
+      color: var(--gold-light);
+      font-weight: 500;
+    }
+
+    .success-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .btn-edit-rsvp {
+      background: rgba(212, 175, 55, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 30px;
+      padding: 0.6rem 1.3rem;
+      color: var(--gold-light);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+
+    .btn-edit-rsvp:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: var(--gold-primary);
+      transform: translateY(-1px);
+    }
+
+    .btn-close-success {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      padding: 0.6rem 1.3rem;
+      color: #FFF;
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+
+    .btn-close-success:hover {
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateY(-1px);
+    }
+  </style>
+  <link rel="stylesheet" href="assets/experience.css?v=2">
+</head>
+<body>
+
+<div class="app">
+  <!-- Double cadre doré d'orfèvrerie mobile -->
+  <div class="app-royal-border" aria-hidden="true"></div>
+
+  <!-- Poussières d'or & bokeh étoilé canvas -->
+  <canvas id="gold-canvas"></canvas>
+
+  <!-- ══════════════════════════════════════════
+       1. COUVERTURE : L'ENVELOPPE SCÉLLÉE
+  ══════════════════════════════════════════ -->
+  <div class="cover-stage" id="cover-stage">
+    
+    <!-- En-tête royal équilibré -->
+    <div class="cover__header">
+      <div class="cover__crest" aria-hidden="true">
+        <svg viewBox="0 0 100 76" width="76" height="54" role="img" aria-label="Signe amazigh">
+          <defs>
+            <linearGradient id="crestGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFF5DE"/>
+              <stop offset="35%" stop-color="#E5C77A"/>
+              <stop offset="70%" stop-color="#BF942E"/>
+              <stop offset="100%" stop-color="#FCE1A4"/>
+            </linearGradient>
+          </defs>
+          <!-- Symbole ⵣ : courbes reprises de l'invitation fournie. -->
+          <path d="M50 10 V66 M25 10 C25 40 75 40 75 10 M25 66 C25 36 75 36 75 66"
+                fill="none" stroke="url(#crestGold)" stroke-width="6" stroke-linecap="butt"/>
+        </svg>
+      </div>
+
+      <p class="cover__bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+      <p class="cover__eyebrow">Correspondance Privée</p>
+
+      <h1 class="cover__names">
+        <span class="couple-name">Pour Vous</span>
+      </h1>
+
+      <div class="cover__divider" aria-hidden="true">
+        <span class="cover__divider-line"></span>
+        <span class="cover__divider-gem">❖</span>
+        <span class="cover__divider-line"></span>
+      </div>
+    </div>
+
+    <!-- Écrin lumineux & Enveloppe 3D -->
+    <div class="envelope-glow" aria-hidden="true"></div>
+    <div class="seal-beacon" aria-hidden="true"></div>
+
+    <div class="envelope-scene" id="envelope-scene">
+      <img class="envelope-fallback" src="assets/envelope_full.png" alt="Enveloppe ivoire et sceau de cire bordeaux">
+      <button id="open-envelope" aria-label="Ouvrir l’enveloppe et découvrir le film" type="button"></button>
+    </div>
+
+    <!-- Zone d'action basse & Invitation à découvrir -->
+    <div class="cover__footer">
+      <button class="cover__btn-open" onclick="document.getElementById('open-envelope').click()" type="button">
+        <span>Ouvrir l'enveloppe</span>
+        <span class="btn-arrow">✦</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       2. LE FILM DU MARIAGE (PLEIN ÉCRAN)
+  ══════════════════════════════════════════ -->
+  <div class="video-stage" id="video-stage" inert>
+    <!-- Barre de contrôle vidéo -->
+    <div class="video-controls">
+      <button class="btn-pill" id="sound-btn" onclick="toggleMute()" aria-label="Contrôle du volume">
+        <span id="sound-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="15" height="15"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        </span>
+        <span id="sound-label">Son activé</span>
+      </button>
+      <button class="btn-pill video-skip" id="video-skip" type="button">
+        Passer la vidéo
+      </button>
+
+    </div>
+
+    <!-- Vidéo officielle -->
+    <button id="video-play" class="btn-pill video-play" hidden type="button">Lire le film</button>
+    <p id="video-status" class="video-status" role="status"></p>
+    <video id="main-video" playsinline preload="auto">
+      <source src="Marriage_kamisse_202609060644.mp4" type="video/mp4">
+    </video>
+
+    <!-- Barre de progression dorée -->
+    <div class="video-progress">
+      <div class="video-progress__bar" id="video-progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       3. LA VRAIE INVITATION
+  ══════════════════════════════════════════ -->
+  <div class="final-invitation" id="final-invitation" aria-hidden="true">
+    <img
+      class="final-invitation__image"
+      src="assets/invitation-finale.jpeg"
+      alt="Invitation de mariage de Kamisse"
+    >
+    <div class="final-invitation__actions">
+      <button class="final-invitation__return" id="return-envelope" type="button">
+        Retourner à l'enveloppe
+      </button>
+      <button class="final-invitation__replay" id="replay-video" type="button">
+        Revoir la vidéo
+      </button>
+    </div>
+  </div>
+
+  <!-- Signature 3D persistante : création numérique de Sélim -->
+  <div class="signature-badge" role="img" aria-label="Sélim Agency">
+    <span class="signature-badge__label">Sélim Agency</span>
+  </div>
+
+</div> <!-- /app -->
+
+
+
+<script>
+  /* ══════════════════════════════════════════
+     POUSSIÈRE D'OR & BOKEH AMBIANT (CANVAS)
+  ══════════════════════════════════════════ */
+  const canvas = document.getElementById('gold-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class GoldParticle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.isStar = Math.random() > 0.7;
+      this.size = this.isStar ? Math.random() * 3 + 1.5 : Math.random() * 2.2 + 0.8;
+      this.speedY = -(Math.random() * 0.32 + 0.08);
+      this.speedX = (Math.random() - 0.5) * 0.22;
+      this.opacity = Math.random() * 0.65 + 0.25;
+      this.phase = Math.random() * Math.PI * 2;
+    }
+    update() {
+      this.y += this.speedY;
+      this.x += this.speedX;
+      this.phase += 0.02;
+      if (this.y < -15 || this.x < -15 || this.x > canvas.width + 15) {
+        this.reset();
+        this.y = canvas.height + 8;
+      }
+    }
+    draw() {
+      const alpha = Math.max(0.1, Math.min(0.85, this.opacity + Math.sin(this.phase) * 0.2));
+      if (this.isStar) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.phase * 0.3);
+        ctx.fillStyle = `rgba(255, 245, 215, ${alpha})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#D4AF37';
+        // Petit éclat 4 branches
+        ctx.beginPath();
+        for (let i = 0; i < 4; i++) {
+          ctx.rotate(Math.PI / 2);
+          ctx.lineTo(this.size * 1.5, 0);
+          ctx.lineTo(this.size * 0.3, this.size * 0.3);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      } else {
+        const radGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
+        radGrad.addColorStop(0, `rgba(255, 245, 215, ${alpha})`);
+        radGrad.addColorStop(0.5, `rgba(212, 175, 55, ${alpha * 0.6})`);
+        radGrad.addColorStop(1, 'rgba(212, 175, 55, 0)');
+        ctx.fillStyle = radGrad;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  for (let i = 0; i < 42; i++) {
+    particles.push(new GoldParticle());
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  /* ══════════════════════════════════════════
+     INTERACTION D'OUVERTURE : ENVELOPPE 3D
+  ══════════════════════════════════════════ */
+  const coverStage  = document.getElementById('cover-stage');
+  const videoStage  = document.getElementById('video-stage');
+  const mainVideo   = document.getElementById('main-video');
+  const progressBar = document.getElementById('video-progress-bar');
+  const soundBtn    = document.getElementById('sound-btn');
+  const soundIcon   = document.getElementById('sound-icon');
+  const soundLabel  = document.getElementById('sound-label');
+  const finalInvitation = document.getElementById('final-invitation');
+  const replayVideo = document.getElementById('replay-video');
+  const returnEnvelope = document.getElementById('return-envelope');
+  const skipVideo = document.getElementById('video-skip');
+
+  function showFinalInvitation() {
+    mainVideo.pause();
+    finalInvitation.classList.add('active');
+    finalInvitation.setAttribute('aria-hidden', 'false');
+  }
+
+  // Barre de progression
+  mainVideo.addEventListener('timeupdate', () => {
+    if (mainVideo.duration) {
+      const pct = (mainVideo.currentTime / mainVideo.duration) * 100;
+      progressBar.style.width = pct + '%';
+    }
+  });
+
+  // Fin de la vidéo : afficher la vraie invitation fournie
+  mainVideo.addEventListener('ended', () => {
+    showFinalInvitation();
+  });
+
+  skipVideo.addEventListener('click', showFinalInvitation);
+
+  replayVideo.addEventListener('click', () => {
+    finalInvitation.classList.remove('active');
+    finalInvitation.setAttribute('aria-hidden', 'true');
+    mainVideo.currentTime = 0;
+    mainVideo.play().catch(() => {});
+  });
+
+  returnEnvelope.addEventListener('click', () => {
+    window.location.reload();
+  });
+
+  // Contrôle du son
+  function toggleMute() {
+    mainVideo.muted = !mainVideo.muted;
+    updateSoundUI();
+  }
+
+  function updateSoundUI() {
+    if (mainVideo.muted) {
+      soundIcon.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24" width="15" height="15"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
+      soundLabel.textContent = 'Son coupé';
+    } else {
+      soundIcon.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24" width="15" height="15"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+      soundLabel.textContent = 'Son activé';
+    }
+  }
+</script>
+
+<script type="module" src="assets/experience.js?v=2"></script>
+
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () {
+    (window.vaq = window.vaq || []).push(arguments);
+  };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+<!-- Vercel Speed Insights -->
+<script type="module" src="assets/speed-insights.js?v=1"></script>
+
+</body>
+</html>
