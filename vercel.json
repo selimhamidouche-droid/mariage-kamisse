@@ -1,0 +1,14 @@
+{
+  "outputDirectory": "dist",
+  "buildCommand": "npm run build",
+  "headers": [
+    {
+      "source": "/Marriage_kamisse_202609060644.mp4",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    }
+  ]
+}
+
